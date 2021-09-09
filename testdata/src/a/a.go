@@ -1,6 +1,6 @@
 package a
 
-func f() {
+func f() { // want f:"panicable"
 	go func() { // want "this goroutine does not recover a panic"
 		print("hello")
 	}()
@@ -23,4 +23,16 @@ func f() {
 	go func() { // want "this goroutine does not recover a panic"
 		defer func() { print("hello") }()
 	}()
+
+	go p1() // OK
+	go p2() // want "this goroutine does not recover a panic"
+}
+
+func p1() { // want p1:"panicable"
+	defer func() { recover() }()
+	panic("hello")
+}
+
+func p2() { // want p2:"panicable"
+	panic("hello")
 }
