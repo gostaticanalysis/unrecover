@@ -55,7 +55,7 @@ func findPanicable(pass *analysis.Pass) {
 	callers := make(map[types.Object][]types.Object)
 	inspect.Preorder(nodes, func(n ast.Node) {
 		fundecl, _ := n.(*ast.FuncDecl)
-		if fundecl == nil {
+		if fundecl == nil || fundecl.Body == nil {
 			return
 		}
 
@@ -206,6 +206,10 @@ func checkPanicable(pass *analysis.Pass) {
 		}
 
 		f := callee(g, goinstr)
+		if f == nil {
+			return true
+		}
+
 		obj := f.Object()
 		if obj != nil && !pass.ImportObjectFact(obj, new(isPanicableFunc)) {
 			return true
